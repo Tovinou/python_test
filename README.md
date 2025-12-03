@@ -61,8 +61,8 @@ Follow these steps to set up the project and run the tests on your local machine
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/reading-list-tests.git
-    cd reading-list-tests
+    git clone https://github.com/Tovinou/python_test.git
+    cd python_test
     ```
 
 2.  **Create and activate a virtual environment:**

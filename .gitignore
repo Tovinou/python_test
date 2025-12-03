@@ -116,6 +116,7 @@ venv.bak/
 
 # Test output
 pretty.output
+debug_output/
 
 # Spyder project settings
 .spyderproject

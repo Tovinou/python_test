@@ -12,3 +12,13 @@ Feature: Mark and Unmark Favorite Books
     Given "Bertil Flimmer" is marked as a favorite
     When I mark "Bertil Flimmer" as a favorite again
     Then "Bertil Flimmer" should not be marked as a favorite
+
+  Scenario: Toggle favorite multiple times
+    When I mark "Bertil Flimmer" as a favorite
+    Then "Bertil Flimmer" should be marked as a favorite
+    When I mark "Bertil Flimmer" as a favorite again
+    Then "Bertil Flimmer" should not be marked as a favorite
+    When I mark "Bertil Flimmer" as a favorite again
+    Then "Bertil Flimmer" should be marked as a favorite
+    When I mark "Bertil Flimmer" as a favorite again
+    Then "Bertil Flimmer" should not be marked as a favorite

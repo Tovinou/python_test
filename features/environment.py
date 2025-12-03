@@ -24,9 +24,20 @@ def before_scenario(context, scenario):
     context.browser = browser.new_context()
     context.page = context.browser.new_page()
     
+    # Set default timeout for all actions (60 seconds)
+    context.page.set_default_timeout(60000)
+    context.page.set_default_navigation_timeout(60000)
+    
     # Navigate to the base URL before each scenario, waiting for the network to be idle
     context.page.goto(BASE_URL, wait_until="networkidle")
+    # Additional wait to ensure JavaScript has fully loaded and rendered
+    context.page.wait_for_load_state("domcontentloaded")
+    # Give the page a moment for any dynamic content to render
+    context.page.wait_for_timeout(2000)  # 2 second wait for SPA to initialize
     
+    # Clear session storage before each scenario to ensure a clean state
+    context.page.evaluate("() => sessionStorage.clear()")
+
     # Initialize page objects and attach them to the context
     context.pages = type('Pages', (), {})() # Create an empty object to hold page instances
     context.pages.base_page = BasePage(context.page)
@@ -41,6 +52,20 @@ def after_scenario(context, scenario):
     """
     Clean up by closing the browser after each scenario.
     """
-    context.page.close()
-    context.browser.close()
-    context.playwright.stop()
+    if hasattr(context, 'page') and context.page:
+        try:
+            context.page.close()
+        except Exception as e:
+            print(f"Error closing page: {e}")
+    
+    if hasattr(context, 'browser') and context.browser:
+        try:
+            context.browser.close()
+        except Exception as e:
+            print(f"Error closing browser: {e}")
+            
+    if hasattr(context, 'playwright') and context.playwright:
+        try:
+            context.playwright.stop()
+        except Exception as e:
+            print(f"Error stopping playwright: {e}")
