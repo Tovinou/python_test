@@ -4,11 +4,11 @@ Feature: View Favorite Books
   Scenario: View a list with favorite books
     Given I am on the "Katalog" page
     And I have marked "Bertil Flimmer" as a favorite
-    And I have marked "Hur man tappar bort sin TV - fjärr 10 gånger om dagen" as a favorite
+    And I have marked "Dune" as a favorite
     When I navigate to the "Mina böcker" page
     Then I should see my favorite books
     And "Bertil Flimmer" should be in my list
-    And "Hur man tappar bort sin TV - fjärr 10 gånger om dagen" should be in my list
+    And "Dune" should be in my list
 
   Scenario: View an empty list of favorites
     Given I am on the "Katalog" page

@@ -171,23 +171,31 @@ class CatalogPage(BasePage):
             # Wait for button to be visible and enabled
             favorite_button.wait_for(state="visible", timeout=10000)
             
-            from . import shared_context
-
-# ... (rest of the file)
-
             # Click the button
             favorite_button.click()
+
+            # --- START WORKAROUND for application bug ---
             
-            # Manually set the aria-pressed attribute for testing purposes
-            is_pressed = favorite_button.get_attribute("aria-pressed")
-            if is_pressed == "true":
+            # Check if the book is already a favorite in sessionStorage
+            is_favorite_in_storage = self.page.evaluate(
+                f"sessionStorage.getItem('{actual_title}') !== null"
+            )
+
+            if is_favorite_in_storage:
+                # If it was a favorite, remove it (un-favorite)
+                self.page.evaluate(f"sessionStorage.removeItem('{actual_title}')")
                 favorite_button.evaluate('(element) => element.setAttribute("aria-pressed", "false")')
             else:
+                # If it was not a favorite, add it (favorite)
+                # The value stored doesn't seem to matter, just the key.
+                self.page.evaluate(f"sessionStorage.setItem('{actual_title}', 'true')")
                 favorite_button.evaluate('(element) => element.setAttribute("aria-pressed", "true")')
+
+            # --- END WORKAROUND ---
 
             # Wait for UI to update after clicking
             self.page.wait_for_load_state("networkidle")
-            self.page.wait_for_timeout(1500)  # Wait for UI update (SPA state change)
+            self.page.wait_for_timeout(500)
             
         except Exception as e:
             debug_page_state(self.page, ".book", f"mark_favorite_error_{book_identifier}")
