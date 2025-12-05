@@ -93,11 +93,19 @@ Follow these steps to set up the project and run the tests on your local machine
     ```bash
     behave
     ```
+    > **Note for Windows users:** If you encounter encoding-related errors, you may need to run the tests using the following command to enforce UTF-8 encoding:
+    > ```cmd
+    > set PYTHONUTF8=1&& python -m behave
+    > ```
 
 *   **To run the tests in headless mode (in the background, faster):**
     ```bash
     behave -D headless=true
     ```
+    > **Note for Windows users:** Similarly, for headless mode, use:
+    > ```cmd
+    > set PYTHONUTF8=1&& python -m behave -D headless=true
+    > ```
 
 *   **To run a specific feature file:**
     ```bash
