@@ -145,3 +145,8 @@ dmypy.json
 # Windows specific
 Thumbs.db
 desktop.ini
+
+# Analysis and summary files
+TEST_RESULTS_ANALYSIS.md
+FIXES_SUMMARY.md
+FIXES_APPLIED.md
