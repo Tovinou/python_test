@@ -19,6 +19,7 @@ The test suite covers the following functionalities of the Läslistan applicatio
     *   Viewing the page when no favorites have been selected (empty state).
 
 ## Project Structure
+```
 reading-list-tests/
 ├── README.md
 ├── STORIES.md
@@ -26,26 +27,27 @@ reading-list-tests/
 ├── behave.ini
 ├── .gitignore
 ├── .github/
-│ └── workflows/
-│ └── test.yml
+│   └── workflows/
+│       └── test.yml
 └── features/
-│ ├── environment.py
-│ ├── view_catalog.feature
-│ ├── add_book.feature
-│ ├── mark_favorites.feature
-│ ├── view_favorites.feature
-│ ├── navigation.feature
-│ ├── steps/
-│ │ ├── catalog_steps.py
-│ │ ├── add_book_steps.py
-│ │ ├── favorites_steps.py
-│ │ ├── view_favorites_steps.py
-│ │ └── navigation_steps.py
-│ └── pages/
-│ ├── base_page.py
-│ ├── catalog_page.py
-│ ├── add_book_page.py
-│ └── my_books_page.py
+    ├── environment.py
+    ├── view_catalog.feature
+    ├── add_book.feature
+    ├── mark_favorites.feature
+    ├── view_favorites.feature
+    ├── navigation.feature
+    ├── steps/
+    │   ├── catalog_steps.py
+    │   ├── add_book_steps.py
+    │   ├── favorites_steps.py
+    │   ├── view_favorites_steps.py
+    │   └── navigation_steps.py
+    └── pages/
+        ├── base_page.py
+        ├── catalog_page.py
+        ├── add_book_page.py
+        └── my_books_page.py
+```
 
 
 ## How to start the project
@@ -115,6 +117,9 @@ Follow these steps to set up the project and run the tests on your local machine
 ## Test Design
 
 *   **Behavior-Driven Development (BDD):** Tests are written in Gherkin syntax (`.feature` files) to describe behavior in a human-readable format.
+
 *   **Page Object Model (POM):** The `features/pages` directory implements the POM design pattern. This separates the test logic (in `steps` files) from the UI interaction logic (in `pages` files), making the code cleaner and more maintainable.
+
 *   **Scenario Outlines:** Used for testing the same scenario with multiple data sets, such as adding different books.
+
 *   **Robust Selectors:** Tests primarily use `data-testid` attributes for locating elements, which are less likely to change than CSS classes or XPath.
