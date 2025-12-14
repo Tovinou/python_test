@@ -1,22 +1,18 @@
 # Reading List Web Application Tests
 
-This project contains automated end-to-end tests for the "Läslistan" web application. The tests are written using Python with the Behave framework (BDD) and Playwright for browser automation.
+This project contains automated end-to-end tests for the "Läslistan" web application. The tests are written using Python with the Behave framework and Playwright.
 
-## What has been tested
+The primary goal of this project was to refactor a slow and unreliable test suite into one that is fast, stable, and uses modern best practices for browser automation. The test setup is now highly optimized for performance, allowing the entire suite to run in just a few seconds.
 
-The test suite covers the following functionalities of the Läslistan application:
+## What is Tested
 
-1.  **Navigation**: Verifies that users can correctly navigate between the "Katalog", "Lägg till bok", and "Mina böcker" pages using the main navigation bar.
-2.  **Viewing the Catalog**: Confirms that the book catalog loads correctly and displays a list of available books.
-3.  **Adding New Books**: Tests the functionality of adding new books to the catalog. This includes:
-    *   Successfully adding a book with a valid title and author.
-    *   Attempting to add a book with missing information (e.g., an empty title).
-4.  **Managing Favorites**: Covers the process of marking books as favorites and unmarking them.
-    *   Marking a book as a favorite.
-    *   Unmarking a book to remove it from favorites.
-5.  **Viewing Favorite Books**: Ensures that the "Mina böcker" page correctly displays the user's list of favorite books.
-    *   Viewing a populated list of favorite books.
-    *   Viewing the page when no favorites have been selected (empty state).
+The test suite covers the following functionalities:
+
+1.  **Navigation**: Verifies navigation between the "Katalog", "Lägg till bok", and "Mina böcker" pages.
+2.  **Viewing the Catalog**: Confirms that the book catalog loads and displays books.
+3.  **Adding New Books**: Tests adding books with valid titles/authors and handling of invalid data (e.g., empty title).
+4.  **Managing Favorites**: Covers marking and unmarking books as favorites.
+5.  **Viewing Favorite Books**: Ensures the "Mina böcker" page displays the user's favorite books and shows an empty state message when no favorites are selected.
 
 ## Project Structure
 ```
@@ -31,17 +27,9 @@ reading-list-tests/
 │       └── test.yml
 └── features/
     ├── environment.py
-    ├── view_catalog.feature
-    ├── add_book.feature
-    ├── mark_favorites.feature
-    ├── view_favorites.feature
-    ├── navigation.feature
+    ├── *.feature
     ├── steps/
-    │   ├── catalog_steps.py
-    │   ├── add_book_steps.py
-    │   ├── favorites_steps.py
-    │   ├── view_favorites_steps.py
-    │   └── navigation_steps.py
+    │   └── *_steps.py
     └── pages/
         ├── base_page.py
         ├── catalog_page.py
@@ -49,22 +37,19 @@ reading-list-tests/
         └── my_books_page.py
 ```
 
-
-## How to start the project
-
-Follow these steps to set up the project and run the tests on your local machine.
+## How to Run the Project
 
 ### Prerequisites
 
-*   Python 3.8 or higher
+*   Python 3.8+
 *   Git
 
 ### Setup Instructions
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/Tovinou/python_test.git
-    cd python_test
+    git clone <your-repository-url>
+    cd <repository-directory>
     ```
 
 2.  **Create and activate a virtual environment:**
@@ -79,47 +64,37 @@ Follow these steps to set up the project and run the tests on your local machine
         venv\Scripts\activate
         ```
 
-3.  **Install the required dependencies:**
+3.  **Install dependencies:**
     ```bash
     pip install -r requirements.txt
     ```
 
-4.  **Install the necessary Playwright browsers:**
+4.  **Install Playwright browsers:**
     ```bash
     playwright install
     ```
 
 ### Running the Tests
 
-*   **To run the tests in headed mode (with a browser window visible):**
+*   **To run all tests:**
     ```bash
     behave
     ```
-    > **Note for Windows users:** If you encounter encoding-related errors, you may need to run the tests using the following command to enforce UTF-8 encoding:
-    > ```cmd
-    > set PYTHONUTF8=1&& python -m behave
-    > ```
 
-*   **To run the tests in headless mode (in the background, faster):**
+*   **To run in headless mode (faster, no visible browser):**
     ```bash
     behave -D headless=true
     ```
-    > **Note for Windows users:** Similarly, for headless mode, use:
-    > ```cmd
-    > set PYTHONUTF8=1&& python -m behave -D headless=true
-    > ```
+    > **Note for Windows Users:** If you see encoding-related errors, you may need to enforce UTF-8. The following command is one way to do this for a single run:
+    > `set PYTHONUTF8=1 && python -m behave`
 
-*   **To run a specific feature file:**
+*   **To run a specific feature:**
     ```bash
-    behave features/view_favorites.feature
+    behave features/navigation.feature
     ```
 
 ## Test Design
 
-*   **Behavior-Driven Development (BDD):** Tests are written in Gherkin syntax (`.feature` files) to describe behavior in a human-readable format.
-
-*   **Page Object Model (POM):** The `features/pages` directory implements the POM design pattern. This separates the test logic (in `steps` files) from the UI interaction logic (in `pages` files), making the code cleaner and more maintainable.
-
-*   **Scenario Outlines:** Used for testing the same scenario with multiple data sets, such as adding different books.
-
-*   **Robust Selectors:** Tests primarily use `data-testid` attributes for locating elements, which are less likely to change than CSS classes or XPath.
+*   **Behavior-Driven Development (BDD):** Tests are written in Gherkin (`.feature` files) to describe application behavior from the user's perspective.
+*   **Page Object Model (POM):** The `features/pages` directory separates UI interaction logic from the test steps, making the code cleaner and easier to maintain.
+*   **Optimized Test Environment:** The test setup in `features/environment.py` is optimized for speed, launching the browser only once for the entire test suite.
