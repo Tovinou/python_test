@@ -3,7 +3,11 @@ from playwright.sync_api import expect
 
 @when('I mark "{book_title}" as a favorite')
 def step_impl(context, book_title):
-    context.pages.catalog_page.mark_book_as_favorite(book_title)
+    # If the book is already marked as favorite, unmark it first, then mark it again
+    # This ensures the book ends up marked as favorite regardless of initial state
+    if context.pages.catalog_page.is_book_marked_as_favorite(book_title):
+        context.pages.catalog_page.mark_book_as_favorite(book_title)  # Unmark
+    context.pages.catalog_page.mark_book_as_favorite(book_title)  # Mark
 
 @then('"{book_title}" should be marked as a favorite')
 def step_impl(context, book_title):

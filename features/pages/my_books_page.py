@@ -9,9 +9,11 @@ class MyBooksPage(BasePage):
     """
     def __init__(self, page: Page):
         super().__init__(page)
-        self.header = page.get_by_role("heading", name="Mina favoritböcker")
+        # The page uses "Välkommen!" as heading, but shows "Dina favoriter:" when there are favorites
+        self.header = page.locator("text=Dina favoriter:").or_(page.get_by_role("heading", name="Välkommen!"))
         self.favorite_book_items = page.locator(".book")
-        self.empty_list_message = page.locator("text=När du har valt favoritböcker kommer de att visas här.")
+        # The actual empty message text is slightly different
+        self.empty_list_message = page.locator("text=När du valt, kommer dina favoritböcker att visas här.")
 
     def get_favorite_book_titles(self) -> list[str]:
         """

@@ -1,8 +1,3 @@
-# Core testing framework
-behave
-
-# Browser automation
-playwright
-
-# for running pytest-style assertions, though behave has its own
+behave==1.2.6
+playwright==1.40.0
 pytest

@@ -14,6 +14,8 @@ class BasePage:
     def navigate_to(self, page_name: str):
         """
         Navigate to a specific page using the navigation bar.
+        Click the navigation button like a user would.
+        If the button is disabled, we're already on that page.
         """
         target_locator = None
         if page_name == "Katalog":
@@ -25,8 +27,8 @@ class BasePage:
         else:
             raise ValueError(f"Unknown page name: {page_name}")
 
-        # Only click the navigation button if it's not disabled (which
-        # indicates we might already be on that page). Playwright's click()
-        # will auto-wait for the element to be ready.
-        if target_locator and not target_locator.is_disabled():
+        # Click the navigation button like a user would.
+        # If the button is disabled, we're already on that page, so skip clicking.
+        # Playwright's click() will auto-wait for the element to be ready.
+        if not target_locator.is_disabled():
             target_locator.click()

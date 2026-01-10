@@ -13,7 +13,7 @@ def before_all(context):
     """
     Launch the browser and create a context once for all scenarios.
     """
-    headless = context.config.userdata.get("headless", "false").lower() == "true"
+    headless = context.config.userdata.get("headless", "true").lower() == "true"
     context.playwright = sync_playwright().start()
     context.browser = context.playwright.chromium.launch(headless=headless)
     context.browser_context = context.browser.new_context()

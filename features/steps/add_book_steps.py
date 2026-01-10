@@ -4,54 +4,44 @@ from playwright.sync_api import expect
 
 @given('I am on the "Lägg till bok" page')
 def step_impl(context):
-    """
-    WORKAROUND: Navigates and forces success by injecting the expected element.
-    """
     context.pages.base_page.navigate_to("Lägg till bok")
-    context.page.evaluate("""
-        () => {
-            if (!document.querySelector('[data-testid="book-title-input"]')) {
-                const el = document.createElement('input');
-                el.setAttribute('data-testid', 'book-title-input');
-                document.body.appendChild(el);
-            }
-        }
-    """)
     expect(context.pages.add_book_page.title_input).to_be_visible()
+
+
+@when('I try to add a new book with title "{title}" and author "{author}"')
+def step_impl(context, title, author):
+    effective_title = "" if title == "<EMPTY>" else title
+    context.pages.add_book_page.add_book(effective_title, author)
+    context.added_book = {"title": effective_title, "author": author}
 
 
 @when('I add a new book with title "{title}" and author "{author}"')
 def step_impl(context, title, author):
-    """
-    Fills out the add book form and submits it.
-    """
-    effective_title = "" if title == "<EMPTY>" else title
-    # Don't actually add the book, just store it for the next step.
-    context.added_book = {"title": effective_title, "author": author}
-    # Ensure the button is disabled for the next step if title is empty.
-    if not effective_title:
-        context.pages.add_book_page.submit_button.evaluate('(el) => el.disabled = true')
+    context.pages.add_book_page.add_book(title, author)
+    context.added_book = {"title": title, "author": author}
 
 
 @then('the "Lägg till ny bok" button should be disabled')
 def step_impl(context):
-    """
-    Verifies that the submit button is disabled.
-    """
     expect(context.pages.add_book_page.submit_button).to_be_disabled()
 
 
-@then('the book should be added to the catalog')
+@then('the book should be added to my books')
 def step_impl(context):
-    """
-    WORKAROUND: This step now does nothing and passes instantly.
-    """
-    pass
+    # After adding a book, it appears in the catalog
+    # To see it in "Mina böcker", we need to mark it as favorite first
+    context.pages.base_page.navigate_to("Katalog")
+    book_title = context.added_book["title"]
+    # Mark the book as favorite
+    context.pages.catalog_page.mark_book_as_favorite(book_title)
+    # Now navigate to "Mina böcker" and verify it's there
+    context.pages.base_page.navigate_to("Mina böcker")
+    # The book should appear in the favorites list
+    expect(context.page.locator(f"text={book_title}")).to_be_visible()
 
 
-@then('the book should not be added to the catalog')
+@then('the book should not be added to my books')
 def step_impl(context):
-    """
-    WORKAROUND: This step now does nothing and passes instantly.
-    """
-    pass
+    context.pages.base_page.navigate_to("Mina böcker")
+    book_title = context.added_book["title"]
+    expect(context.page.locator(f"//h3[text()='{book_title}']")).not_to_be_visible()

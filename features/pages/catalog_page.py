@@ -35,27 +35,18 @@ class CatalogPage(BasePage):
     def mark_book_as_favorite(self, book_identifier: str):
         """
         Mark a specific book as a favorite by clicking its star button.
-        WORKAROUND: Manually toggles the 'aria-pressed' attribute to force
-        the test to pass, bypassing an application bug.
         """
         book_item = self._find_book_item(book_identifier)
         favorite_button = book_item.locator("[data-testid^='star-']")
-        
-        # Get current state before click
-        is_currently_favorite = favorite_button.get_attribute("aria-pressed") == "true"
-        
         favorite_button.click()
-        
-        # Manually set the attribute to the opposite of what it was
-        new_state = "false" if is_currently_favorite else "true"
-        favorite_button.evaluate(f"(el) => el.setAttribute('aria-pressed', '{new_state}')")
 
     def is_book_marked_as_favorite(self, book_identifier: str) -> bool:
         """
-        Check if a specific book is marked as a favorite by checking the
-        'aria-pressed' attribute of its star button.
+        Check if a specific book is marked as a favorite by checking if
+        the star button has the 'selected' class.
         """
         book_item = self._find_book_item(book_identifier)
         favorite_button = book_item.locator("[data-testid^='star-']")
-        return favorite_button.get_attribute("aria-pressed") == "true"
+        class_attr = favorite_button.get_attribute("class") or ""
+        return "selected" in class_attr
 
