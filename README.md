@@ -1,100 +1,73 @@
 # Reading List Web Application Tests
 
-This project contains automated end-to-end tests for the "Läslistan" web application. The tests are written using Python with the Behave framework and Playwright.
+Detta projekt innehåller automatiserade end-to-end-tester för webbsidan "Läslistan". Testerna är skrivna i Python med Behave-ramverket och Playwright.
 
-The primary goal of this project was to refactor a slow and unreliable test suite into one that is fast, stable, and uses modern best practices for browser automation. The test setup is now highly optimized for performance, allowing the entire suite to run in just a few seconds.
+## Vad som har testats
 
-## What is Tested
+Testpaketet täcker följande funktionalitet:
 
-The test suite covers the following functionalities:
+1. **Navigation**: Verifierar navigation mellan sidorna "Katalog", "Lägg till bok" och "Mina böcker".
+2. **Visa katalog**: Bekräftar att bokkatalogen laddas och visar böcker.
+3. **Lägga till nya böcker**: Testar att lägga till böcker med giltiga titlar/författare och hantering av ogiltiga data (t.ex. tom titel).
+4. **Hantera favoriter**: Täcker att markera och avmarkera böcker som favoriter, inklusive att växla favoritstatus flera gånger.
+5. **Visa favoritböcker**: Säkerställer att sidan "Mina böcker" visar användarens favoritböcker och visar ett tomt tillstånd när inga favoriter är valda.
 
-1.  **Navigation**: Verifies navigation between the "Katalog", "Lägg till bok", and "Mina böcker" pages.
-2.  **Viewing the Catalog**: Confirms that the book catalog loads and displays books.
-3.  **Adding New Books**: Tests adding books with valid titles/authors and handling of invalid data (e.g., empty title).
-4.  **Managing Favorites**: Covers marking and unmarking books as favorites.
-5.  **Viewing Favorite Books**: Ensures the "Mina böcker" page displays the user's favorite books and shows an empty state message when no favorites are selected.
+## Hur man startar projektet
 
-## Project Structure
-```
-reading-list-tests/
-├── README.md
-├── STORIES.md
-├── requirements.txt
-├── behave.ini
-├── .gitignore
-├── .github/
-│   └── workflows/
-│       └── test.yml
-└── features/
-    ├── environment.py
-    ├── *.feature
-    ├── steps/
-    │   └── *_steps.py
-    └── pages/
-        ├── base_page.py
-        ├── catalog_page.py
-        ├── add_book_page.py
-        └── my_books_page.py
-```
+### Förutsättningar
 
-## How to Run the Project
-
-### Prerequisites
-
-*   Python 3.8+
+*   Python 3.8 eller senare
 *   Git
 
-### Setup Instructions
+### Installationsinstruktioner
 
-1.  **Clone the repository:**
+1.  **Klona repositoryt:**
     ```bash
-    git clone <your-repository-url>
-    cd <repository-directory>
+    git clone <repository-url>
+    cd reading-list-tests
     ```
 
-2.  **Create and activate a virtual environment:**
-    *   On macOS/Linux:
+2.  **Skapa och aktivera ett virtuellt miljö:**
+    *   På macOS/Linux:
         ```bash
         python3 -m venv venv
         source venv/bin/activate
         ```
-    *   On Windows:
+    *   På Windows:
         ```bash
         python -m venv venv
         venv\Scripts\activate
         ```
 
-3.  **Install dependencies:**
+3.  **Installera beroenden:**
     ```bash
     pip install -r requirements.txt
     ```
 
-4.  **Install Playwright browsers:**
+4.  **Installera Playwright-webbläsare:**
     ```bash
-    playwright install
+    playwright install chromium
     ```
 
-### Running the Tests
+### Köra testerna
 
-*   **To run all tests:**
+*   **För att köra alla tester:**
     ```bash
     behave
     ```
 
-*   **To run in headless mode (faster, no visible browser):**
+*   **För att köra i headless-läge (snabbare, ingen synlig webbläsare):**
     ```bash
     behave -D headless=true
     ```
-    > **Note for Windows Users:** If you see encoding-related errors, you may need to enforce UTF-8. The following command is one way to do this for a single run:
-    > `set PYTHONUTF8=1 && python -m behave`
 
-*   **To run a specific feature:**
+*   **För att köra en specifik feature:**
     ```bash
     behave features/navigation.feature
     ```
 
-## Test Design
+## Testdesign
 
-*   **Behavior-Driven Development (BDD):** Tests are written in Gherkin (`.feature` files) to describe application behavior from the user's perspective.
-*   **Page Object Model (POM):** The `features/pages` directory separates UI interaction logic from the test steps, making the code cleaner and easier to maintain.
-*   **Optimized Test Environment:** The test setup in `features/environment.py` is optimized for speed, launching the browser only once for the entire test suite.
+*   **Behavior-Driven Development (BDD):** Tester är skrivna i Gherkin (`.feature`-filer) för att beskriva applikationens beteende från användarens perspektiv.
+*   **Page Object Model (POM):** Katalogen `features/pages` separerar UI-interaktionslogik från teststegen, vilket gör koden renare och lättare att underhålla.
+*   **Optimerad testmiljö:** Testuppsättningen i `features/environment.py` är optimerad för hastighet och startar webbläsaren endast en gång för hela testpaketet.
