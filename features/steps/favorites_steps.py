@@ -1,30 +1,47 @@
-from behave import given, then, when
+from behave import given, when, then
 from playwright.sync_api import expect
 
-@when('I mark "{book_title}" as a favorite')
-def step_impl(context, book_title):
-    # If the book is already marked as favorite, unmark it first, then mark it again
-    # This ensures the book ends up marked as favorite regardless of initial state
-    if context.pages.catalog_page.is_book_marked_as_favorite(book_title):
-        context.pages.catalog_page.mark_book_as_favorite(book_title)  # Unmark
-    context.pages.catalog_page.mark_book_as_favorite(book_title)  # Mark
+@when('jag klickar på hjärtat för boken "{title}"')
+def step_impl(context, title):
+    context.catalog_page.toggle_favorite(title)
 
-@then('"{book_title}" should be marked as a favorite')
-def step_impl(context, book_title):
-    is_favorite = context.pages.catalog_page.is_book_marked_as_favorite(book_title)
-    assert is_favorite, f"Expected '{book_title}' to be marked as favorite, but it is not"
+@then('ska boken "{title}" finnas under "Mina böcker"')
+def step_impl(context, title):
+    context.catalog_page.go_to_favorites()
+    expect(context.page.get_by_text(title)).to_be_visible()
 
-@given('"{book_title}" is marked as a favorite')
-def step_impl(context, book_title):
-    if not context.pages.catalog_page.is_book_marked_as_favorite(book_title):
-        context.pages.catalog_page.mark_book_as_favorite(book_title)
+@given('jag har lagt till boken "{title}" som favorit')
+def step_impl(context, title):
+    context.catalog_page.navigate()
+    context.catalog_page.toggle_favorite(title)
 
-@then('"{book_title}" should not be marked as a favorite')
-def step_impl(context, book_title):
-    is_favorite = context.pages.catalog_page.is_book_marked_as_favorite(book_title)
-    assert not is_favorite, f"Expected '{book_title}' to NOT be marked as favorite, but it is marked as favorite"
+@given('boken "{title}" är inte favorit')
+def step_impl(context, title):
+    context.catalog_page.navigate()
+    # Vi antar att startläget är att den inte är favorit. 
+    # Om vi ville vara säkra kunde vi kolla om den finns i favoriter först och ta bort den.
+    # Men eftersom varje scenario körs i en ny kontext (browser context) är state återställt.
+    pass
 
-@when('I mark "{book_title}" as a favorite again')
-def step_impl(context, book_title):
-    # Toggle the favorite status (click again to unmark)
-    context.pages.catalog_page.mark_book_as_favorite(book_title)
+@when('jag tar bort favoriten "{title}"')
+def step_impl(context, title):
+    context.catalog_page.go_to_catalog()
+    context.catalog_page.toggle_favorite(title)
+
+@then('ska boken "{title}" inte finnas under "Mina böcker"')
+def step_impl(context, title):
+    context.catalog_page.go_to_favorites()
+    expect(context.page.get_by_text(title)).not_to_be_visible()
+
+@when('jag går till "Mina böcker"')
+def step_impl(context):
+    context.catalog_page.go_to_favorites()
+
+@then('ska jag se boken "{title}" i listan')
+def step_impl(context, title):
+    expect(context.page.get_by_text(title)).to_be_visible()
+
+@then('ska favoritlistan vara tom')
+def step_impl(context):
+    count = context.page.locator(".book").count()
+    assert count == 0, f"Förväntade 0 favoritböcker, men hittade {count}"

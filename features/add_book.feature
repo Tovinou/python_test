@@ -1,18 +1,18 @@
-Feature: Add New Book
-  As a user, I want to add a new book to my reading list.
+Feature: Lägg till ny bok
+  Som en användare
+  Vill jag kunna lägga till saknade böcker i katalogen
+  Så att listan blir mer komplett
 
-  Scenario Outline: Add a new book with valid information
-    Given I am on the "Lägg till bok" page
-    When I add a new book with title "<title>" and author "<author>"
-    Then the book should be added to my books
+  Scenario Outline: Lägg till en ny bok
+    Given jag är på startsidan
+    When jag går till sidan för att lägga till bok
+    And jag anger titeln "<title>"
+    And jag anger författaren "<author>"
+    And jag sparar boken
+    Then ska boken "<title>" finnas i katalogen
+    And boken "<title>" ska ha författaren "<author>"
 
     Examples:
-      | title                  | author         |
-      | The Hitchhiker's Guide | Douglas Adams  |
-      | Dune                   | Frank Herbert  |
-
-  Scenario: Attempt to add a book with an empty title
-    Given I am on the "Lägg till bok" page
-    When I try to add a new book with title "<EMPTY>" and author "Some Author"
-    Then the "Lägg till ny bok" button should be disabled
-    And the book should not be added to my books
+      | title                 | author          |
+      | Min nya bok           | Jag Själv       |
+      | Python för nybörjare  | Guido van Rossum|

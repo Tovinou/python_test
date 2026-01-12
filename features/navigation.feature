@@ -1,17 +1,13 @@
-Feature: Navigate Between Pages
-  As a user, I want to navigate between the main sections of the website.
+Feature: Navigering
+  Som användare vill jag kunna navigera mellan sidans vyer.
 
-  Scenario: Navigate to the catalog page
-    Given I am on the start page
-    When I navigate to the "Katalog" page
-    Then I should be on the "Katalog" page
+  Scenario Outline: Navigera till vy via huvudnavigation
+    Given jag är på startsidan
+    When jag klickar på navigation "<länktext>"
+    Then ska vyn visa "<förväntad_vy>"
 
-  Scenario: Navigate to the add book page
-    Given I am on the start page
-    When I navigate to the "Lägg till bok" page
-    Then I should be on the "Lägg till bok" page
-
-  Scenario: Navigate to the my books page
-    Given I am on the start page
-    When I navigate to the "Mina böcker" page
-    Then I should be on the "Mina böcker" page
+    Examples:
+      | länktext     | förväntad_vy |
+      | Lägg till bok | Lägg till bok |
+      | Mina böcker   | Mina böcker   |
+      | Katalog       | Katalog       |

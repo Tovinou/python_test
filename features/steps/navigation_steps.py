@@ -1,34 +1,33 @@
-from behave import given, then, when
+from behave import when, then
 from playwright.sync_api import expect
 
+def _map_link_text_to_testid(text):
+    if text == "Lägg till bok":
+        return "add-book"
+    if text == "Mina böcker":
+        return "favorites"
+    if text == "Katalog":
+        return "catalog"
+    raise ValueError(f"Okänd länktext: {text}")
 
-@given('I am on the start page')
-def step_impl(context):
-    # The before_scenario hook already navigates to the start page.
-    # This step is just for readability.
-    pass
+@when('jag klickar på navigation "{link_text}"')
+def step_impl(context, link_text):
+    testid = _map_link_text_to_testid(link_text)
+    btn = context.page.get_by_test_id(testid)
+    if not btn.is_disabled():
+        btn.click()
 
-
-@when('I navigate to the "{page_name}" page')
-def step_impl(context, page_name):
-    """
-    Navigates to the specified page using the main navigation.
-    """
-    context.pages.base_page.navigate_to(page_name)
-
-
-@then('I should be on the "Katalog" page')
-def step_impl(context):
-    expect(context.pages.catalog_page.welcome_header).to_be_visible()
-
-
-@then('I should be on the "Lägg till bok" page')
-def step_impl(context):
-    expect(context.pages.add_book_page.title_input).to_be_visible()
-
-
-@then('I should be on the "Mina böcker" page')
-def step_impl(context):
-    # The page shows "Välkommen!" heading, which is also on catalog page
-    # But we can verify we're on the right page by checking the navigation button is disabled
-    expect(context.pages.base_page.nav_mina_bocker).to_be_disabled()
+@then('ska vyn visa "{expected_view}"')
+def step_impl(context, expected_view):
+    if expected_view == "Lägg till bok":
+        expect(context.page.get_by_test_id("add-input-title")).to_be_visible()
+        expect(context.page.get_by_test_id("add-input-author")).to_be_visible()
+        expect(context.page.get_by_role("button", name="Lägg till ny bok")).to_be_visible()
+        return
+    if expected_view == "Mina böcker":
+        expect(context.page.get_by_test_id("favorites")).to_be_disabled()
+        return
+    if expected_view == "Katalog":
+        expect(context.page.locator(".book").first).to_be_visible()
+        return
+    raise ValueError(f"Okänd vy: {expected_view}")
