@@ -5,12 +5,15 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   timeout: 60000, // Increase timeout to 60 seconds
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:5173',
+    reuseExistingServer: !process.env.CI,
+    cwd: '..',
+    timeout: 120 * 1000,
+  },
   use: {
-    // Appen är publicerad på GitHub Pages
-    // URL: https://tovinou.github.io/test/
-    // För lokal utveckling: 'http://localhost:5173'
-    // Använd miljövariabel TEST_URL för att välja, annars använd GitHub Pages
-    baseURL: process.env.TEST_URL || 'https://tovinou.github.io/test/',
+    baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
