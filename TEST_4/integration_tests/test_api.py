@@ -14,7 +14,7 @@ def test_get_products_200():
 
 def test_product_count():
     """
-    Test case 2 (VG): Verify that 20 products are returned.
+    Verify that 20 products are returned.
     """
     response = requests.get(f"{BASE_URL}/products")
     assert response.status_code == 200
@@ -23,7 +23,7 @@ def test_product_count():
 
 def test_product_structure():
     """
-    Test case 3 (VG): Verify a specific product has correct fields.
+    Verify a specific product has correct fields.
     """
     response = requests.get(f"{BASE_URL}/products/1")
     assert response.status_code == 200
@@ -37,7 +37,7 @@ def test_product_structure():
 
 def test_specific_product_data():
     """
-    Test case 4 (VG): Verify specific product ID returns correct data.
+    Verify specific product ID returns correct data.
     """
     response = requests.get(f"{BASE_URL}/products/1")
     assert response.status_code == 200

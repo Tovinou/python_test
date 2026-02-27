@@ -21,7 +21,7 @@ def driver():
 
 def test_successful_login(driver):
     """
-    Test case 1 (G): Successful login with correct credentials.
+    Successful login with correct credentials.
     """
     driver.get("https://www.saucedemo.com/")
     
@@ -48,7 +48,7 @@ def test_invalid_username(driver):
 
 def test_invalid_password(driver):
     """
-    Test case 3 (VG): Invalid password shows error message.
+    Invalid password shows error message.
     """
     driver.get("https://www.saucedemo.com/")
     
