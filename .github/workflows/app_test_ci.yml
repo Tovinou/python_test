@@ -3,8 +3,12 @@ name: App Test
 on:
   push:
     branches: [ "main", "master" ]
+    paths:
+      - 'app_test/**'
   pull_request:
     branches: [ "main", "master" ]
+    paths:
+      - 'app_test/**'
 
 jobs:
   test:

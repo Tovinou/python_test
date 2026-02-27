@@ -3,8 +3,12 @@ name: Reading List Tests
 on:
   push:
     branches: [ "main", "master" ]
+    paths:
+      - 'reading-list-tests/**'
   pull_request:
     branches: [ "main", "master" ]
+    paths:
+      - 'reading-list-tests/**'
 
 jobs:
   test:
