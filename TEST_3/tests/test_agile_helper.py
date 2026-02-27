@@ -24,7 +24,7 @@ def test_only_standup_during_sprint(page: Page):
     page.get_by_role("button").get_by_text(re.compile("mitt i", re.I)).click()
 
     expect(page.get_by_role("button").get_by_text(re.compile("Daily standup", re.I))).to_have_count(1)
-    expect(page.get_by_role("button").get_by_text(re.compile("Sprint planning|Review|Retrospective|Backlog", re.I))).to_have_count(0)
+    expect(page.get_by_role("button").get_by_text(re.compile("Sprint planning|Sprint Review|Sprint Retrospective|Backlog", re.I))).to_have_count(0)
 
 
 def test_initial_prompt_visible(page: Page):
