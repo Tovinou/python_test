@@ -1,0 +1,24 @@
+# Docker Compose configuration for local testing environment
+# This file can be used to set up local services for testing (e.g., databases, mock servers)
+
+version: '3.8'
+
+services: {}
+
+  # Example: PostgreSQL database for integration tests
+  # Uncomment and configure as needed
+  # postgres:
+  #   image: postgres:15
+  #   environment:
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: testdb
+  #   ports:
+  #     - "5432:5432"
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+
+

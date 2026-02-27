@@ -1,0 +1,22 @@
+## Scenario 1 – Lyckad registrering
+Given att användaren fyller i alla fält korrekt
+When användaren klickar på ”Ok nu kör vi”
+Then ska formuläret skickas in utan felmeddelanden
+
+## Scenario 2 – Svagt lösenord
+Given att alla fält är korrekt ifyllda
+And lösenordet är "1234"
+When användaren försöker skicka formuläret
+Then ska ett felmeddelande visas
+And knappen ska vara disabled
+
+## Scenario 3 – Felaktig e-post
+Given att alla fält är korrekt ifyllda
+But e-posten saknar @
+When användaren försöker skicka formuläret
+Then ska ett felmeddelande visas
+
+## Scenario 4 – Tomma fält stoppar submission
+Given att fälten är tomma
+When sidan laddas
+Then ska knappen vara disabled

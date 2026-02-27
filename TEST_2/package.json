@@ -1,0 +1,25 @@
+{
+  "name": "form-registration-tests",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "playwright test -c config/playwright.config.ts",
+    "test:e2e": "playwright test -c config/playwright.config.ts tests/e2e/specs/",
+    "test:form": "playwright test -c config/playwright.config.ts tests/e2e/specs/form-*.spec.ts",
+    "test:ui": "playwright test -c config/playwright.config.ts --headed",
+    "test:debug": "playwright test -c config/playwright.config.ts --debug",
+    "test:report": "playwright show-report test-results/html-report",
+    "test:ci": "playwright test -c config/playwright.config.ts --reporter=html,line",
+    "test:unit": "node -e \"console.log('No unit tests configured')\"",
+    "install:browsers": "playwright install",
+    "lint": "eslint tests/ --ext .ts",
+    "lint:fix": "eslint tests/ --ext .ts --fix"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "eslint": "^9.11.0",
+    "@typescript-eslint/parser": "^8.9.0",
+    "@typescript-eslint/eslint-plugin": "^8.9.0"
+  }
+}

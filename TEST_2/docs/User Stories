@@ -1,0 +1,43 @@
+User Stories – Formulärregistrering
+
+Översikt
+- Målet är att möjliggöra säker och användarvänlig registrering med tydlig feedback och god prestanda.
+- Fokus på korrekt validering, tillgänglighet och stabilt beteende i flera webbläsare.
+
+US1: Registrera konto
+- Som användare vill jag kunna fylla i namn, födelseår, e‑post och lösenord så att jag kan skapa ett konto.
+- Acceptans:
+  - Givet att sidan är laddad, när jag fyller alla fält med giltig data och klickar på "Ok nu kör vi" ska registreringen lyckas eller inga felmeddelanden visas.
+  - Knappen "Ok nu kör vi" ska vara disabled tills alla obligatoriska fält är giltiga.
+
+US2: Valideringsfeedback
+- Som användare vill jag få direkt valideringsfeedback så att jag kan korrigera mina inmatningar.
+- Acceptans:
+  - Namn: obligatoriskt, minst 2 tecken, inga siffror/specialtecken.
+  - Födelseår: numeriskt, inom 1900–2024, minst 13 år.
+  - E‑post: giltigt format `text@domän.tld`.
+  - Lösenord: minst 6 tecken, måste innehålla både bokstäver och siffror, visa meddelande vid svagt lösenord.
+
+US3: Systemvalidering
+- Som system vill jag validera användardata konsekvent och förhindra svag eller ogiltig input så att kvaliteten säkerställs.
+- Acceptans:
+  - Felmeddelanden ska visas i tydlig, konsekvent form (alert/feedområde).
+  - Inga konsolfel får uppstå vid normal sidinteraktion.
+
+US4: Tillgänglighet
+- Som användare med hjälpmedel vill jag kunna förstå och använda formuläret så att registreringen fungerar för alla.
+- Acceptans:
+  - Semantiska roller och etiketter används.
+  - Viktiga element är tabb‑bara och synliga.
+  - Knappar och fält har tillräcklig kontrast.
+
+US5: Prestanda
+- Som användare vill jag att sidan ska ladda snabbt och ge responsiv feedback.
+- Acceptans:
+  - Sidladdningstid < 3 sekunder under normal nätverksförbindelse.
+  - Valideringsrespons < 1 sekund vid typiska fel (t.ex. ogiltig e‑post).
+
+Definition of Done
+- Samtliga acceptanskriterier uppfyllda i test.
+- Inga blockerande konsolfel eller UI‑fel.
+- Testsviten passerar i minst en huvudwebbläsare innan utökning till fler.

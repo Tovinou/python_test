@@ -1,0 +1,55 @@
+name: TEST CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    paths:
+      - 'TEST/**'
+  pull_request:
+    branches: [ "main", "master" ]
+    paths:
+      - 'TEST/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: TEST/package-lock.json
+
+    # Install and Build App
+    - name: Install App Dependencies
+      run: npm ci
+      working-directory: ./TEST
+      
+    - name: Build App
+      run: npm run build
+      working-directory: ./TEST
+      
+    # Install and Run Tests
+    - name: Install Test Dependencies
+      run: npm install
+      working-directory: ./TEST/E2E_test
+      
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+      working-directory: ./TEST/E2E_test
+      
+    - name: Run Playwright tests
+      run: npx playwright test
+      working-directory: ./TEST/E2E_test
+      
+    - name: Upload Playwright report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-report-test
+        path: TEST/E2E_test/playwright-report/
+        retention-days: 30
