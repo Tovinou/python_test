@@ -5,7 +5,7 @@ BASE_URL = "https://fakestoreapi.com"
 
 def test_get_products_200():
     """
-    Test case 1 (G): GET /products returns status code 200.
+    GET /products returns status code 200.
     Note: This is expected to fail in GitHub Actions with 403 due to bot protection,
     which is the desired outcome for the assignment.
     """

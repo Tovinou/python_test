@@ -35,7 +35,7 @@ def test_successful_login(driver):
 
 def test_invalid_username(driver):
     """
-    Test case 2 (VG): Invalid username shows error message.
+    Invalid username shows error message.
     """
     driver.get("https://www.saucedemo.com/")
     
