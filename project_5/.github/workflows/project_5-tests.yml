@@ -1,0 +1,81 @@
+name: Project 5 Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Integration_test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r Integration_test/requirements.txt
+
+      - name: Install Playwright browsers
+        run: |
+          python -m playwright install --with-deps chromium
+
+      - name: Run Integration_test suite
+        run: |
+          python Integration_test/scripts/run_tests.py
+
+  playwright-script:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Playwright (Python)
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+
+      - name: Install Playwright browsers
+        run: |
+          python -m playwright install --with-deps chromium
+
+      - name: Run Playwright script
+        env:
+          CI: "true"
+          UI_KEEP_OPEN_SECONDS: "0"
+        run: |
+          python playwright/tests/playwright_test.py
+
+  selenium-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Selenium
+        run: |
+          python -m pip install --upgrade pip
+          pip install selenium
+
+      - name: Install Xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+
+      - name: Run Selenium test
+        run: |
+          xvfb-run -a python Selenium_test/tests/ui_test.py
