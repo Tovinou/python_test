@@ -1,3 +1,4 @@
 envn/
 __pycache__/
 *.pyc
+*.docx
