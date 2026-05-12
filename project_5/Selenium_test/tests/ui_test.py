@@ -10,10 +10,17 @@ import time
 class UntitledTestCase(unittest.TestCase):
 
     def setUp(self):
+        # Setup Chrome options for CI/headless environment
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless=new')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        
         # Start Chrome browser
-        self.driver = webdriver.Chrome()
-        # Maximize window to make actions visible
-        self.driver.maximize_window()
+        self.driver = webdriver.Chrome(options=options)
+        
+        # Maximize window is mostly for visible mode, but setting a standard size is safer for headless
+        self.driver.set_window_size(1920, 1080)
 
         # Wait up to 30 seconds
         self.driver.implicitly_wait(30)
