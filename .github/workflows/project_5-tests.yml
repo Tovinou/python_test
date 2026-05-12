@@ -54,7 +54,7 @@ jobs:
           CI: "true"
           UI_KEEP_OPEN_SECONDS: "0"
         run: |
-          python project_5/playwright/tests/playwright_test.py
+          python project_5/login_test/playwright/tests/playwright_test.py
 
   selenium-test:
     runs-on: ubuntu-latest
@@ -78,4 +78,4 @@ jobs:
 
       - name: Run Selenium test
         run: |
-          xvfb-run -a python project_5/Selenium_test/tests/ui_test.py
+          xvfb-run -a python project_5/login_test/Selenium_test/tests/ui_test.py
