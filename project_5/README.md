@@ -3,8 +3,10 @@
 This repository contains three independent Python testing examples. Each folder has its own setup/run instructions:
 
 - [Integration_test/](python_test/project_5/Integration_test/README.md): FakeStoreAPI API + UI (Playwright) integration tests
-- [playwright/](python_test/project_5/playwright/README.md): Playwright (Python) demo script
-- [Selenium_test/](python_test/project_5/Selenium_test/README.md): Selenium (Python) UI test demo
+
+[login_test]
+		- [playwright/](python_test/project_5/playwright/README.md): Playwright (Python) demo script
+		- [Selenium_test/](python_test/project_5/Selenium_test/README.md): Selenium (Python) UI test demo
 
 ## CI
 
