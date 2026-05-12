@@ -20,7 +20,8 @@ jobs:
       - name: Install Integration_test dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r Integration_test/requirements.txt
+          pip install -r project_5/Integration_test/requirements.txt
+          pip install playwright
 
       - name: Install Playwright browsers
         run: |
@@ -28,7 +29,7 @@ jobs:
 
       - name: Run Integration_test suite
         run: |
-          python Integration_test/scripts/run_tests.py
+          python project_5/Integration_test/scripts/run_tests.py
 
   playwright-script:
     runs-on: ubuntu-latest
@@ -54,7 +55,7 @@ jobs:
           CI: "true"
           UI_KEEP_OPEN_SECONDS: "0"
         run: |
-          python playwright/tests/playwright_test.py
+          python project_5/playwright/tests/playwright_test.py
 
   selenium-test:
     runs-on: ubuntu-latest
@@ -78,4 +79,4 @@ jobs:
 
       - name: Run Selenium test
         run: |
-          xvfb-run -a python Selenium_test/tests/ui_test.py
+          xvfb-run -a python project_5/Selenium_test/tests/ui_test.py
