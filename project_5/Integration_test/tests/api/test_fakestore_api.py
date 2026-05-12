@@ -1,76 +1,33 @@
-import requests # api-testning
-import pytest
+import requests
 
 BASE_URL = "https://fakestoreapi.com"
 
 
+def _get_ok(path: str) -> requests.Response:
+    url = f"{BASE_URL}{path}"
+    r = requests.get(url, timeout=30)
+    assert r.status_code == 200, f"GET {path} expected 200, got {r.status_code}"
+    return r
+
+
 def test_get_products_status_code():
-    """
-      GET /products ska returnera 200 lokalt.
-    GitHub Actions förväntas kunna få 403.
-    """
-
-    response = requests.get(f"{BASE_URL}/products")
-
-    # Lokalt ska detta vara 200
-    # I GitHub Actions kan API:t blockera med 403
-    assert response.status_code in [200, 403]
-
-    # Om det INTE är 403 vill säkerställa att det är 200
-    if response.status_code != 403:
-        assert response.status_code == 200
+    """GET /products returns 200 (CI may get 403 and fail the job per assignment)."""
+    _get_ok("/products")
 
 
 def test_number_of_products():
-    """
-        Kontrollera antal produkter.
-    """
-    response = requests.get(f"{BASE_URL}/products")
-
-    if response.status_code == 403:
-        pytest.skip("FakeStoreAPI blocked GitHub Actions with 403")
-
-    assert response.status_code == 200
-
-    products = response.json()
-
-    # FakeStoreAPI har normalt 20 produkter
-    assert len(products) == 20
+    data = _get_ok("/products").json()
+    assert len(data) == 20
 
 
 def test_product_contains_required_fields():
-    """
-    Kontrollera att produkten innehåller rätt fält.
-    """
-    response = requests.get(f"{BASE_URL}/products/1")
-
-    if response.status_code == 403:
-        pytest.skip("FakeStoreAPI blocked GitHub Actions with 403")
-
-    assert response.status_code == 200
-
-    product = response.json()
-
-    assert "title" in product
-    assert "price" in product
-    assert "category" in product
+    product = _get_ok("/products/1").json()
+    assert "title" in product and "price" in product and "category" in product
 
 
 def test_specific_product_data():
-    """
-        Kontrollera att rätt produktdata returneras.
-    """
-    response = requests.get(f"{BASE_URL}/products/1")
-
-    if response.status_code == 403:
-        pytest.skip("FakeStoreAPI blocked GitHub Actions with 403")
-
-    assert response.status_code == 200
-
-    product = response.json()
-
+    product = _get_ok("/products/1").json()
     assert product["id"] == 1
-
     assert (
         product["title"]
         == "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops"

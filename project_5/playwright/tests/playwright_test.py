@@ -1,17 +1,25 @@
 # -*- coding: utf-8 -*-
 import os
+import re
+import sys
 import time
-from playwright.sync_api import sync_playwright
+
+from playwright.sync_api import expect, sync_playwright
+
+from run_logger import BASE_URL, LOCATORS, RunLogger
+
 
 class UntitledPlaywrightTest:
     def __init__(self):
         self.playwright = None
         self.browser = None
         self.page = None
+        self.rlog = RunLogger()
 
     def setup(self):
         self.playwright = sync_playwright().start()
         is_ci = os.environ.get("CI", "").lower() == "true"
+        self.rlog.start_playwright(is_ci)
         self.browser = self.playwright.chromium.launch(headless=is_ci)
         self.page = self.browser.new_page()
         self.page.set_viewport_size({"width": 1280, "height": 720})
@@ -19,124 +27,118 @@ class UntitledPlaywrightTest:
 
     def teardown(self):
         keep_open_seconds = float(os.getenv("UI_KEEP_OPEN_SECONDS", "2"))
+        self.rlog.closing_browser(keep_open_seconds)
         time.sleep(keep_open_seconds)
         self.browser.close()
         self.playwright.stop()
+        self.rlog.done()
 
-    def highlight_and_click(self, locator):
-        try:
-            locator.evaluate("el => el.style.border='3px solid red'")
-            time.sleep(0.5)
-            locator.click()
-            time.sleep(0.5)
-            locator.evaluate("el => el.style.border=''")
-        except Exception as e:
-            print(f"  ⚠️ Could not click element: {e}")
+    def _open_login_page(self) -> None:
+        self.rlog.step_open_login_page(BASE_URL)
+        self.page.goto(BASE_URL, wait_until="domcontentloaded")
+        self.rlog.step_page_loaded_dom()
 
-    def highlight_and_type(self, locator, text):
-        try:
-            locator.evaluate("el => el.style.border='3px solid red'")
-            time.sleep(0.5)
-            locator.fill(text)
-            time.sleep(0.5)
-            locator.evaluate("el => el.style.border=''")
-        except Exception as e:
-            print(f"  ⚠️ Could not type in element: {e}")
+    def test_login_succeeds(self):
+        """G: Successful login and inventory (home) page."""
+        self.rlog.banner_test_g()
+        self._open_login_page()
+
+        self.rlog.step_attempt_valid_credentials()
+        self.rlog.log_locator("username")
+        self.page.fill(LOCATORS["username"]["css"], "standard_user")
+        self.rlog.value_standard_user_entered()
+
+        self.rlog.log_locator("password")
+        self.page.fill(LOCATORS["password"]["css"], "secret_sauce")
+        self.rlog.value_secret_sauce_entered()
+
+        self.rlog.log_locator("login_button")
+        self.rlog.step_click_log_in()
+        self.page.click(LOCATORS["login_button"]["css"])
+
+        self.rlog.verify_user_logged_in_header()
+        self.rlog.verify_url_should_contain_inventory()
+        expect(self.page).to_have_url(re.compile(r"inventory"))
+        self.rlog.check_url_ok()
+
+        self.rlog.log_locator("inventory_list")
+        self.rlog.verify_product_list_should_show()
+        expect(self.page.locator(LOCATORS["inventory_list"]["css"])).to_be_visible()
+        self.rlog.check_inventory_list_visible()
+        self.rlog.result_g_passed()
+
+    def test_wrong_username_shows_error(self):
+        """VG: Wrong username shows an error message."""
+        self.rlog.banner_test_vg_wrong_username()
+        self._open_login_page()
+
+        self.rlog.step_attempt_wrong_username()
+        self.rlog.log_locator("username")
+        self.page.fill(LOCATORS["username"]["css"], "not_a_real_sauce_user")
+        self.rlog.value_invalid_username()
+
+        self.rlog.log_locator("password")
+        self.page.fill(LOCATORS["password"]["css"], "secret_sauce")
+        self.rlog.value_valid_password()
+
+        self.rlog.log_locator("login_button")
+        self.page.click(LOCATORS["login_button"]["css"])
+
+        self.rlog.step_verify_error_on_page()
+        self.rlog.log_locator("error_message")
+        err = self.page.locator(LOCATORS["error_message"]["css"])
+        expect(err).to_be_visible()
+        self.rlog.check_error_box_visible()
+        expect(err).to_contain_text("Username and password do not match")
+        self.rlog.check_error_text_username_password_mismatch()
+        self.rlog.result_vg_wrong_username_passed()
+
+    def test_wrong_password_shows_error(self):
+        """VG: Wrong password shows an error message."""
+        self.rlog.banner_test_vg_wrong_password()
+        self._open_login_page()
+
+        self.rlog.step_attempt_wrong_password()
+        self.rlog.log_locator("username")
+        self.page.fill(LOCATORS["username"]["css"], "standard_user")
+        self.rlog.value_valid_username()
+
+        self.rlog.log_locator("password")
+        self.page.fill(LOCATORS["password"]["css"], "wrong_password")
+        self.rlog.value_invalid_password()
+
+        self.rlog.log_locator("login_button")
+        self.page.click(LOCATORS["login_button"]["css"])
+
+        self.rlog.step_verify_error_on_page()
+        self.rlog.log_locator("error_message")
+        err = self.page.locator(LOCATORS["error_message"]["css"])
+        expect(err).to_be_visible()
+        self.rlog.check_error_box_visible()
+        expect(err).to_contain_text("Username and password do not match")
+        self.rlog.check_error_text_username_password_mismatch()
+        self.rlog.result_vg_wrong_password_passed()
 
     def test_untitled_test_case(self):
-        print("Opening website")
-        self.page.goto("https://www.saucedemo.com/")
-        time.sleep(1)
+        """Backward compatibility: same as successful login test."""
+        self.test_login_succeeds()
 
-        # Username field
-        print("Entering username")
-        username = self.page.locator("#user-name")
-        self.highlight_and_type(username, "komlam")
-
-        # Password field
-        print("Entering password")
-        password = self.page.locator("#password")
-        self.highlight_and_type(password, "rrfcccxx")
-
-        # Login button
-        print("Clicking login button")
-        login_btn = self.page.locator("#login-button")
-        self.highlight_and_click(login_btn)
-        time.sleep(1)
-
-        # Random clicks – add .first and xpath= prefix
-        print("Clicking random element")
-        elem1 = self.page.locator("xpath=//div[@id='root']/div").first
-        self.highlight_and_click(elem1)
-
-        elem2 = self.page.locator("xpath=//div[@id='root']/div/div[2]/div[2]/div/div[2]").first
-        self.highlight_and_click(elem2)
-
-        # Login credentials section
-        print("Clicking login credentials element")
-        cred_elem = self.page.locator("#login_credentials")
-        self.highlight_and_click(cred_elem)
-        self.highlight_and_click(cred_elem)
-        self.highlight_and_click(cred_elem)
-
-        # Additional clicks
-        print("Clicking additional element")
-        add_elem = self.page.locator("xpath=//div[@id='root']/div/div").first
-        self.highlight_and_click(add_elem)
-
-        print("Clicking login button")
-        self.highlight_and_click(login_btn)
-        self.highlight_and_click(login_btn)
-
-        print("Clicking random element")
-        rand_elem = self.page.locator("xpath=//div[@id='root']/div").first
-        self.highlight_and_click(rand_elem)
-
-        # SVG icon clicks – fixed with xpath= prefix
-        print("Clicking SVG icon element")
-        svg1 = self.page.locator(
-            "xpath=(.//*[normalize-space(text()) and normalize-space(.)='Swag Labs'])[2]/following::*[name()='svg'][2]"
-        ).first
-        self.highlight_and_click(svg1)
-
-        svg2 = self.page.locator(
-            "xpath=(.//*[normalize-space(text()) and normalize-space(.)='Swag Labs'])[2]/following::*[name()='svg'][1]"
-        ).first
-        self.highlight_and_click(svg2)
-
-        # More interactions
-        print("Clicking more element")
-        more_elem = self.page.locator("xpath=//div[@id='root']/div/div[2]/div").first
-        self.highlight_and_click(more_elem)
-
-        # Clear password
-        print("Clearing password")
-        self.highlight_and_type(password, "")
-
-        # Click page
-        page_elem = self.page.locator("xpath=//div[@id='root']/div/div[2]/div").first
-        self.highlight_and_click(page_elem)
-
-        # Clear username
-        print("Clearing username")
-        self.highlight_and_type(username, "")
-
-        # Final clicks
-        print("Clicking login credentials element")
-        self.highlight_and_click(cred_elem)
-
-        final_elem1 = self.page.locator("xpath=//div[@id='root']/div/div[2]/div[2]/div").first
-        self.highlight_and_click(final_elem1)
-
-        final_elem2 = self.page.locator("xpath=//div[@id='root']/div/div[2]/div[2]/div/div[2]").first
-        self.highlight_and_click(final_elem2)
-
-        print("Test finished – browser closes in 2 seconds")
 
 if __name__ == "__main__":
+    rlog = RunLogger()
+    rlog.suite_intro()
     test = UntitledPlaywrightTest()
     test.setup()
+    exit_code = 0
     try:
-        test.test_untitled_test_case()
+        test.test_login_succeeds()
+        test.test_wrong_username_shows_error()
+        test.test_wrong_password_shows_error()
+        rlog.suite_all_passed()
+    except Exception:
+        exit_code = 1
+        rlog.suite_failed_banner()
+        raise
     finally:
         test.teardown()
+    sys.exit(exit_code)

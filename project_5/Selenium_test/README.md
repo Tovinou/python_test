@@ -1,6 +1,6 @@
 # Selenium Test Project
 
-This project contains a simple Selenium UI test written with Python `unittest`.
+This project contains Selenium UI tests for [Sauce Demo](https://www.saucedemo.com/) login, written with Python `unittest`.
 
 ## Prerequisites
 
@@ -26,20 +26,20 @@ Run the test directly:
 .\venv\Scripts\python.exe .\tests\ui_test.py
 ```
 
-Or run via `unittest`:
+Or run via `unittest` from the project root:
 
 ```powershell
-.\venv\Scripts\python.exe -m unittest -v .\tests\ui_test.py
+.\venv\Scripts\python.exe -m unittest tests.ui_test -v
 ```
 
-## What The Test Does
+## What the tests cover
 
-- Opens https://www.saucedemo.com/ in Chrome
-- Types into the username/password fields and clicks around the page
-- Highlights elements in red before clicking/typing to make actions visible
+- **Successful login:** correct credentials, then assert inventory URL and visible product list.
+- **Wrong username:** assert the login error banner (`[data-test='error']`) is visible with text.
+- **Wrong password:** same error-banner checks.
 
-The test is primarily a UI interaction demo; it does not currently include assertions about page state.
+Fields and the login button are briefly outlined in red before each action (useful when Chrome is visible). In CI, highlight pauses default to **0** so runs stay fast. Override with `UI_HIGHLIGHT_DELAY` (seconds), e.g. `0.5`. Optional: `UI_KEEP_OPEN_SECONDS` to pause before closing the browser.
 
-## Project Structure
+## Project structure
 
-- `tests/ui_test.py` contains the Selenium test case
+- `tests/ui_test.py` — `SauceDemoLoginTests` (three test methods)

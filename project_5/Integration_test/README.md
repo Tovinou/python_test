@@ -77,4 +77,4 @@ python scripts\run_tests.py
 
 ## CI Note
 
-FakeStoreAPI may sometimes return `403 Forbidden` from CI networks. The API tests tolerate/skip `403` where appropriate.
+FakeStoreAPI often returns `403 Forbidden` from GitHub Actions (bot traffic). Tests assert **HTTP 200** for `/products` (and related checks), so the workflow **fails** in CI when the API responds with 403, which matches the course requirement.

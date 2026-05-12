@@ -1,178 +1,112 @@
 # -*- coding: utf-8 -*-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import NoAlertPresentException
-import unittest
+import os
 import time
+import unittest
+
+from selenium import webdriver
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
+LOGIN_URL = "https://www.saucedemo.com/"
+ERROR_BANNER = (By.CSS_SELECTOR, "[data-test='error']")
 
 
-class UntitledTestCase(unittest.TestCase):
+class SauceDemoLoginTests(unittest.TestCase):
+    """Automatiserade testfall för inloggning på Sauce Demo.
+
+    Fält och knapp markeras kort med röd ram innan interaktion (bra vid manuell
+    körning). I CI är pausen 0 så testerna inte sakta ned; sätt UI_HIGHLIGHT_DELAY
+    om du vill tvinga paus även där.
+    """
 
     def setUp(self):
-        # Setup Chrome options for CI/headless environment
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless=new')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-        
-        # Start Chrome browser
+        self.is_ci = os.environ.get("CI", "").lower() == "true"
+        self.keep_open_seconds = float(os.getenv("UI_KEEP_OPEN_SECONDS", "0"))
+        default_highlight = "0" if self.is_ci else "0.5"
+        self.highlight_pause = float(os.getenv("UI_HIGHLIGHT_DELAY", default_highlight))
+
+        options = Options()
+        if self.is_ci:
+            options.add_argument("--headless=new")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+
         self.driver = webdriver.Chrome(options=options)
-        
-        # Maximize window is mostly for visible mode, but setting a standard size is safer for headless
         self.driver.set_window_size(1920, 1080)
-
-        # Wait up to 30 seconds
-        self.driver.implicitly_wait(30)
-
-        self.base_url = "https://www.google.com/"
-        self.verificationErrors = []
-        self.accept_next_alert = True
+        self.wait = WebDriverWait(self.driver, 15)
 
     def tearDown(self):
-        # Wait a moment so you can see final state
-        time.sleep(2)
-        # Close browser
+        if self.keep_open_seconds > 0:
+            time.sleep(self.keep_open_seconds)
         self.driver.quit()
-        self.assertEqual([], self.verificationErrors)
+
+    def _sleep_highlight(self):
+        if self.highlight_pause > 0:
+            time.sleep(self.highlight_pause)
 
     def highlight_and_click(self, element):
-        """Highlights element in red, clicks it, then removes highlight"""
+        """Röd ram, klick, kort paus, återställ ram."""
         self.driver.execute_script("arguments[0].style.border='3px solid red'", element)
-        time.sleep(0.5)  # see the highlight
+        self._sleep_highlight()
         element.click()
-        time.sleep(0.5)  # see the click result
-        self.driver.execute_script("arguments[0].style.border=''", element)
+        self._sleep_highlight()
+        try:
+            self.driver.execute_script("arguments[0].style.border=''", element)
+        except StaleElementReferenceException:
+            # T.ex. lyckad inloggning byter sida innan ramen hinner tas bort.
+            pass
 
     def highlight_and_type(self, element, text):
-        """Highlights element, clears it, types text"""
+        """Röd ram, rensa, skriv text, kort paus, återställ ram."""
         self.driver.execute_script("arguments[0].style.border='3px solid red'", element)
-        time.sleep(0.5)
+        self._sleep_highlight()
         element.clear()
         element.send_keys(text)
-        time.sleep(0.5)
+        self._sleep_highlight()
         self.driver.execute_script("arguments[0].style.border=''", element)
 
-    def test_untitled_test_case(self):
-        driver = self.driver
+    def _open_login_page(self):
+        self.driver.get(LOGIN_URL)
+        self.wait.until(EC.visibility_of_element_located((By.ID, "user-name")))
 
-        # Open SauceDemo website
-        print("Opening website")
-        driver.get("https://www.saucedemo.com/")
-        time.sleep(1)  # let the page load visibly
-
-        # Username field - using highlight method
-        print("Entering username")
-        username_field = driver.find_element(By.ID, "user-name")
-        self.highlight_and_type(username_field, "komlam")
-
-        # Password field
-        print("Entering password")
-        password_field = driver.find_element(By.ID, "password")
-        self.highlight_and_type(password_field, "rrfcccxx")
-
-        # Login button
-        print("Clicking login button")
-        login_btn = driver.find_element(By.ID, "login-button")
-        self.highlight_and_click(login_btn)
-        time.sleep(1)  # see login attempt result
-
-        # Random clicks from original exported script
-        print("Clicking random element")
-        elem = driver.find_element(By.XPATH, "//div[@id='root']/div")
-        self.highlight_and_click(elem)
-
-        elem2 = driver.find_element(By.XPATH, "//div[@id='root']/div/div[2]/div[2]/div/div[2]")
-        self.highlight_and_click(elem2)
-
-        # Login credentials section
-        print("Clicking login credentials element")
-        cred_elem = driver.find_element(By.ID, "login_credentials")
-        self.highlight_and_click(cred_elem)
-        self.highlight_and_click(cred_elem)  # second click
-        self.highlight_and_click(cred_elem)  # third click
-
-        # Additional clicks
-        print("Clicking additional element")
-        add_elem = driver.find_element(By.XPATH, "//div[@id='root']/div/div")
-        self.highlight_and_click(add_elem)
-
-        print("Clicking login button")
-        self.highlight_and_click(login_btn)
+    def _submit_login(self, username, password):
+        user_field = self.driver.find_element(By.ID, "user-name")
+        self.highlight_and_type(user_field, username)
+        password_field = self.driver.find_element(By.ID, "password")
+        self.highlight_and_type(password_field, password)
+        login_btn = self.driver.find_element(By.ID, "login-button")
         self.highlight_and_click(login_btn)
 
-        print("Clicking random element")
-        rand_elem = driver.find_element(By.XPATH, "//div[@id='root']/div")
-        self.highlight_and_click(rand_elem)
+    def test_successful_login_goes_to_inventory(self):
+        self._open_login_page()
+        self._submit_login("standard_user", "secret_sauce")
 
-        # SVG icon clicks
-        print("Clicking SVG icon element")
-        svg1 = driver.find_element(
-            By.XPATH,
-            "(.//*[normalize-space(text()) and normalize-space(.)='Swag Labs'])[2]/following::*[name()='svg'][2]"
+        self.wait.until(EC.url_contains("inventory"))
+        inventory_list = self.wait.until(
+            EC.visibility_of_element_located((By.CLASS_NAME, "inventory_list"))
         )
-        self.highlight_and_click(svg1)
 
-        svg2 = driver.find_element(
-            By.XPATH,
-            "(.//*[normalize-space(text()) and normalize-space(.)='Swag Labs'])[2]/following::*[name()='svg'][1]"
-        )
-        self.highlight_and_click(svg2)
+        self.assertIn("inventory", self.driver.current_url)
+        self.assertTrue(inventory_list.is_displayed())
 
-        # More interactions
-        print("Clicking more element")
-        more_elem = driver.find_element(By.XPATH, "//div[@id='root']/div/div[2]/div")
-        self.highlight_and_click(more_elem)
+    def test_wrong_username_shows_error_message(self):
+        self._open_login_page()
+        self._submit_login("not_a_real_user", "secret_sauce")
 
-        # Clear password
-        print("Clearing password")
-        self.highlight_and_type(password_field, "")  # empty string clears
+        error = self.wait.until(EC.visibility_of_element_located(ERROR_BANNER))
+        self.assertTrue(error.is_displayed())
+        self.assertGreater(len(error.text.strip()), 0)
 
-        # Click page
-        page_elem = driver.find_element(By.XPATH, "//div[@id='root']/div/div[2]/div")
-        self.highlight_and_click(page_elem)
+    def test_wrong_password_shows_error_message(self):
+        self._open_login_page()
+        self._submit_login("standard_user", "wrong_password")
 
-        # Clear username
-        print("Clearing username")
-        self.highlight_and_type(username_field, "")
-
-        # Final clicks
-        print("Clicking login credentials element")
-        self.highlight_and_click(cred_elem)
-
-        final_elem1 = driver.find_element(By.XPATH, "//div[@id='root']/div/div[2]/div[2]/div")
-        self.highlight_and_click(final_elem1)
-
-        final_elem2 = driver.find_element(By.XPATH, "//div[@id='root']/div/div[2]/div[2]/div/div[2]")
-        self.highlight_and_click(final_elem2)
-
-        print("Test finished - browser will close in 2 seconds")
-
-    def is_element_present(self, how, what):
-        try:
-            self.driver.find_element(by=how, value=what)
-        except NoSuchElementException:
-            return False
-        return True
-
-    def is_alert_present(self):
-        try:
-            self.driver.switch_to.alert
-        except NoAlertPresentException:
-            return False
-        return True
-
-    def close_alert_and_get_its_text(self):
-        try:
-            alert = self.driver.switch_to.alert
-            alert_text = alert.text
-            if self.accept_next_alert:
-                alert.accept()
-            else:
-                alert.dismiss()
-            return alert_text
-        finally:
-            self.accept_next_alert = True
+        error = self.wait.until(EC.visibility_of_element_located(ERROR_BANNER))
+        self.assertTrue(error.is_displayed())
+        self.assertGreater(len(error.text.strip()), 0)
 
 
 if __name__ == "__main__":
